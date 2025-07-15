@@ -1,0 +1,12 @@
+[package]
+name = "solana_client"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+solana-sdk = "2.2.19"
+solana-client = "2.2.19"
+solana-transaction-status = "2.2.19"
+borsh = "1.4.0"
+borsh-derive = "1.4.0"
+dirs = "6.0.0"
