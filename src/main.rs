@@ -9,7 +9,7 @@ use solana_sdk::{
 use solana_client::rpc_client::RpcClient;
 use borsh::{BorshSerialize, BorshDeserialize};
 
-use std::fs;
+
 use std::str::FromStr;
 
 const PROGRAM_ID: &str = "2hw2KWzHo6Ca5Xjxf3PwUn9p7JdUuyZHBLNz8SVCAySF";
@@ -29,7 +29,8 @@ fn main() {
 
     println!("Program ID: {}",program_id);
 
-    let vault = Keypair::new();
+    // let vault = Keypair::new();
+    let vault = read_keypair_file("vault_account.json").expect("failed to read");
     println!("Vault account pubkey: {}", vault.pubkey());
 
     let rent_lamports = rpc.get_minimum_balance_for_rent_exemption(32)
@@ -39,10 +40,22 @@ fn main() {
     let create_ix = system_instruction::create_account(
         &payer.pubkey(), &vault.pubkey(), rent_lamports, 32, &program_id);
 
+    let init_ix = Instruction{
+        program_id,
+        accounts: vec![
+            AccountMeta::new(vault.pubkey(), false),
+        ],
+        data: vec![0x00]
+    };
+
     let blockhash = rpc.get_latest_blockhash().unwrap();
     let tx = Transaction::new_signed_with_payer(
-        &[create_ix], Some(&payer.pubkey()), &[&payer, &vault], blockhash);
+        &[create_ix, init_ix], 
+        Some(&payer.pubkey()), 
+        &[&payer, &vault], 
+        blockhash,
+    );
 
     let sig = rpc.send_and_confirm_transaction(&tx).unwrap();
-    println!("Vault account created\nTx: https://explorer.solana.com/tx/{}?cluster=devnet", sig);
+    println!("Check transaction on Solana Explorer:\nhttps://explorer.solana.com/tx/{}?cluster=devnet",sig);
 }
