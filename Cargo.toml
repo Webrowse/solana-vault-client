@@ -10,3 +10,8 @@ solana-transaction-status = "2.2.19"
 borsh = "1.4.0"
 borsh-derive = "1.4.0"
 dirs = "6.0.0"
+
+
+[[bin]]
+name = "read_vault"
+path = "src/read_vault.rs"
